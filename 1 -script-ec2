@@ -1,0 +1,21 @@
+#Scirpt RUN Start Instances EC2 
+aws ec2 run-instances --image-id ami-<> --instance-type t2.micro --key-name <>
+--security-group-ids sg-<> --subnet-id subnet-<> --region <> --count <>
+--tag-specifications 'ResourceType=instanece,Tags=[{Key=<>,Value=<>}]'
+
+#Script Filter e Query Intsances EC2
+aws ec2 describe-instances --filters "Name=tag:grupo,Values=automacao-cli" --query "Reservations[*].Instances[*]
+.[InstancesId,ImageId,Tags[?Key=='grupo'].Value]"
+
+instance_ids=$(aws ec2 describe-instances --filters "Name=tag:grupo,Values=automacao-cli" 
+--query "Reservations[*].Instances[*].[InstanceId]" | tr -d ] | tr -d [ | tr -d , | tr -d '"')
+
+
+#Script Stop Instances
+aws ec2 stop-instances --instance-ids $instance_ids --output table
+
+#Script Start Instance
+aws ec2 start-instances --instance-ids $instance_ids --output table
+
+#Script terminate instances EC2
+aws ec2 terminate-instances --instance-ids $instance_ids --output table
